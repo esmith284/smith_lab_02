@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "index.html#methods",
+    "href": "index.html#methods",
+    "title": "9041 Assignment 2",
+    "section": "Methods",
+    "text": "Methods\n\nParticipants\nThis dataset contains responses from 63 participants across a variety of relationship statuses and age groups (Table 1).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDistribution of Relationship Status by Age Group\n\n\nAge group\n\nRelationship Status\n\n\n\ndivorced\nin a relationship\nmarried\nnever been in a relationship\nnot in a relationship\nprefer not to say\n\n\n\n\n18-24\n0\n12\n1\n0\n28\n3\n\n\n24-34\n0\n7\n0\n1\n4\n0\n\n\n35-44\n0\n1\n1\n0\n1\n0\n\n\n45-54\n0\n0\n1\n0\n0\n0\n\n\n55-64\n1\n1\n1\n0\n0\n0\n\n\n\n\n\n\n\nMeasures\nThis dataset contains responses from three Inventories related to attachment and social anxiety. The Social Interaction Anxiety Scale is a 20-item inventory that measures the degree to which individuals experience anxiety in social environments (Cronbach’s alpha = 0.9). The Experiences in Close Relationships Scale is a shortened, 9-item inventory which measures attachment-related anxiety (Cronbach’s alpha = 0.94). Finally, the Rosenberg Self-Esteem Scale is a 10-item scale that contains questions on one’s self-esteem (Cronbach’s alpha = 0.85).\n\n\nData Analysis Strategy\nBoth the Social Interaction Anxiety Scale and the Rosenberg Self-Esteem Scale contain items that were reverse-scored. Specifically, the data for variables SA_5, SA_9, SA_11, SEst_2, SEst_5, SEst_6, SEst_8, and SEst_9 were reverse keyed."
+  },
+  {
+    "objectID": "index.html#results",
+    "href": "index.html#results",
+    "title": "9041 Assignment 2",
+    "section": "Results",
+    "text": "Results\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDescriptive Statistics for Three Attachment and Social Anixety Instruments\n\n\nScales\n\nCentral Tendency\n\n\nVariability\n\n\nReliability Values (Cronbach's alpha)\n\n\n\nmean\nmedian\nsd\nrange\nalphas\n\n\n\n\nsocial_interaction\n2.39\n2.30\n0.70\n3.00\n0.90\n\n\nclose_relationships\n3.40\n3.11\n1.62\n5.89\n0.94\n\n\nself_esteem\n2.23\n2.20\n0.51\n2.20\n0.85\n\n\n\n\n\nOverall descriptive statistics were calculated for the three scales in the dataset. Participants had a mean score of 2.39 on the Social Interaction Anxiety Scale, 3.4 on the Experiences in Close Relationships Scale, and 2.23 on the Rosenberg Self-Esteem Scale.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDescriptive Statistics for Attachment and Social Anxiety Inventories for People in Relationships\n\n\nScales\n\nCentral Tendency\n\n\nVariability\n\n\nReliability Values (Chronbach's alpha)\n\n\n\nmean\nmedian\nsd\nrange\nalphas_filtered\n\n\n\n\nsocial_interaction\n2.32\n2.30\n0.70\n2.85\n0.90\n\n\nclose_relationships\n3.32\n2.56\n1.77\n5.78\n0.94\n\n\nself_esteem\n2.16\n2.20\n0.59\n1.90\n0.85\n\n\n\n\n\nWhen only including participants in a relationship, participants had a mean score of 2.32 on the Social Interaction Anxiety Scale, a mean score of 3.32 on the Experiences in Close Relationships Scale, and a mean score of 2.16 on the Rosenberg Self-Esteem Scale."
+  }
+]

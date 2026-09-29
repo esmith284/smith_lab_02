@@ -1,0 +1,231 @@
+---
+title: "9041 Assignment 2"
+author: Selena Esteves
+date: today
+format: 
+    html:
+      toc: true
+      code-fold: true
+      code-summary: "Show code"
+      df-print: paged
+execute:
+    echo: false
+    warning: false
+---
+
+```{r, load libraries}
+#| output: FALSE
+
+library(tidyverse)
+library(readxl)
+library(psych)
+library(gt)
+library(janitor)
+```
+
+```{r, load data}
+#| output: FALSE
+
+#load data
+data <- read_excel("./Attachment_Anxiety_Data.xlsx")
+#inspect data
+head(data)
+```
+
+```{r, clean data}
+#| output: FALSE
+
+attach_anx.clean <- data |> 
+mutate(Gender = case_when(Gender == 1 ~ "Male", Gender == 2 ~ "Female")) |> 
+mutate(`Age group` = case_when(`Age group` == 1 ~ "18-24", `Age group` == 2 ~ "24-34", `Age group` == 3 ~ "35-44", `Age group` == 4 ~ "45-54", `Age group` == 5 ~ "55-64" )) |> 
+mutate(Relationship = case_when(Relationship == 1 ~ "married", Relationship == 2 ~ "in a relationship", Relationship == 4 ~ "divorced", Relationship == 5 ~ "not in a relationship", Relationship == 6 ~ "never been in a relationship", Relationship == 7 ~ "prefer not to say")) |> 
+mutate(Ethnicity = case_when(Ethnicity == 1 ~ "white/Caucasian", Ethnicity == 2 ~ "Asian/Asian British", Ethnicity == 5 ~ "Other ethnic group", Ethnicity == 6 ~ "prefer not to say")) |> 
+select(Gender, `Age group`, Relationship, Ethnicity, SA_1:SEst_10) |> 
+mutate_at(5:43, as.integer)
+```
+
+```{r, score items}
+#| output: FALSE
+
+# define scales
+social_interaction_keys <- list(social_interaction = c("SA_1","SA_2","SA_3","SA_4","-SA_5","SA_6","SA_7","SA_8","-SA_9","SA_10","-SA_11","SA_12","SA_13","SA_14","SA_15","SA_16","SA_17","SA_18","SA_19","SA_20"))
+close_relationship_keys <- list(close_relationships = c("AA_1","AA_2","AA_3","AA_4","AA_5","AA_6","AA_7","AA_8","AA_9"))
+self_esteem_keys <- list(self_esteem = c("SEst_1","-SEst_2","SEst_3","SEst_4","-SEst_5","-SEst_6","SEst_7","-SEst_8","-SEst_9","SEst_10"))
+
+#compute Cronbach's alpha and average scores
+social_interaction_scores <- scoreItems(social_interaction_keys, attach_anx.clean, totals = F, min=0, max=4)
+close_relationship_scores <- scoreItems(close_relationship_keys, attach_anx.clean, totals = F, min=1, max=7)
+self_esteem_scores <- scoreItems(self_esteem_keys, attach_anx.clean, totals=F, min=1, max=4)
+
+#convert new scores into individual dataframes
+social_interaction_scores.df <- as.data.frame(social_interaction_scores$scores)
+close_relationship_scores.df <- as.data.frame(close_relationship_scores$scores)
+self_esteem_scores.df <- as.data.frame(self_esteem_scores$scores)
+```
+
+```{r, combine dataframes}
+#| output: FALSE
+
+#combine into one dataframe
+allscores.df <- cbind(social_interaction_scores.df, close_relationship_scores.df, self_esteem_scores.df)
+combineall.df <- cbind(allscores.df, attach_anx.clean)
+```
+
+```{r, reduce data}
+#| output: FALSE
+
+# select only variables of interest
+attach_anx.final <- combineall.df |> 
+select("Gender", `Age group`, "Relationship", "Ethnicity", "social_interaction", "close_relationships", "self_esteem")
+```
+
+```{r, reproducible table of relationship by age group}
+#| output: FALSE
+
+# Create a demographics table of relationship status by age group
+demographic_table <- attach_anx.final |> 
+tabyl(`Age group`, Relationship)
+
+# Create reproducible gt table
+gttable.1 <- demographic_table |>
+gt() |> 
+tab_header(
+    title = md("Distribution of Relationship Status by Age Group")) |> 
+cols_width(
+    everything() ~ pct(14.3)) |> 
+tab_spanner(
+    label="Relationship Status",
+    columns = c(divorced:`prefer not to say`)
+)
+
+```
+
+```{r, reproducible table for 3 Attachment and Social Anxiety Scales}
+#| output: FALSE
+
+#round alpha values to 2 decimals
+alphas <- round(c(social_interaction_scores$alpha,
+close_relationship_scores$alpha,
+self_esteem_scores$alpha), 2)
+
+#summary statistics for the three scales
+summary <- describe(select(attach_anx.final, social_interaction:self_esteem))
+summary
+
+#sample size label
+n <- (describe(attach_anx.final))[1,2]
+
+#create a column for the scales in the summary table
+Scales <- c("social_interaction", "close_relationships", "self_esteem")
+summary$Scales <- Scales
+
+#keep only selected columns
+summary <- summary |> 
+select(Scales, mean, median, sd, range) |> 
+mutate_if(is.numeric, round, 2)
+
+#combine summary with alphas
+summary.table <- cbind(summary, alphas)
+
+# Create reproducable summary table with alphas
+gttable.2 <- gt(summary.table) |> 
+tab_header(
+    title = md("*Descriptive Statistics for Three Attachment and Social Anixety Instruments*")) |> 
+tab_stubhead(label= "Composites") |> 
+tab_spanner(
+        label= "Central Tendency",
+        columns = c(mean, median)
+) |> 
+        tab_spanner(
+label= "Variability",
+columns = c(sd, range)
+        ) |> 
+tab_spanner(
+            label = "Reliability Values (Cronbach's alpha)",
+            columns = c(alphas)
+)
+```
+
+```{r, filter dataset}
+#| output: FALSE
+
+# Filter dataset to one demographic variable -  extract only participants in a relationship
+attach_anx.filtered <- attach_anx.final |> 
+filter(Relationship == "in a relationship")
+
+table(attach_anx.filtered$Relationship)
+```
+
+```{r, reproducible table for filtered scale scores}
+#| output: FALSE
+
+#round filtered alphas to 2 decimals
+alphas_filtered <- round(c(
+social_interaction_scores$alpha,
+close_relationship_scores$alpha,
+self_esteem_scores$alpha), 2)
+
+#summary statistics
+summary_filtered <- describe(select(attach_anx.filtered, social_interaction:self_esteem))
+summary_filtered
+
+#create column for scales
+Scales <- c("social_interaction", "close_relationships", "self_esteem")
+summary_filtered$Scales <- Scales
+
+#select columns of interest
+summary_filtered <- summary_filtered |> 
+select(Scales, mean, median, sd, range) |> 
+mutate_if(is.numeric, round, 2)
+
+#combine filtered summary and filtered alphas
+filtered_summary_table <- cbind(summary_filtered, alphas_filtered)
+
+#create the reproducible gt table
+gttable.3 <- gt(filtered_summary_table) |> 
+tab_header(
+    title = md("*Descriptive Statistics for Attachment and Social Anxiety Inventories for People in Relationships*")) |> 
+tab_stubhead(label= "Composites")|>
+    tab_spanner(
+        label="Central Tendency",
+        columns = c(mean, median)
+    )|>
+        tab_spanner(
+        label="Variability",
+        columns = c(sd, range)
+        )|>
+            tab_spanner(
+        label="Reliability Values (Chronbach's alpha)",
+        columns = c(alphas_filtered)
+            ) 
+```
+
+## Introduction
+
+
+## Methods
+
+### Participants
+
+This dataset contains responses from `{r} n <- (describe(attach_anx.final))[1,2]` participants across a variety of relationship statuses and age groups (Table 1).
+
+`{r} gttable.1`
+
+
+### Measures
+
+This dataset contains responses from three Inventories related to attachment and social anxiety. The Social Interaction Anxiety Scale is a 20-item inventory that measures the degree to which individuals experience anxiety in social environments (Cronbach's alpha = `{r} alphas[1]`). The Experiences in Close Relationships Scale is a shortened, 9-item inventory which measures attachment-related anxiety (Cronbach's alpha = `{r} alphas[2]`). Finally, the Rosenberg Self-Esteem Scale is a 10-item scale that contains questions on one's self-esteem (Cronbach's alpha = `{r} alphas[3]`).
+
+### Data Analysis Strategy
+
+Both the Social Interaction Anxiety Scale and the Rosenberg Self-Esteem Scale contain items that were reverse-scored. Specifically, the data for variables SA_5, SA_9, SA_11, SEst_2, SEst_5, SEst_6, SEst_8, and SEst_9 were reverse keyed.
+
+## Results
+
+`{r} gttable.2`
+
+Overall descriptive statistics were calculated for the three scales in the dataset. Participants had a mean score of `{r} summary.table[1,2]` on the Social Interaction Anxiety Scale, `{r} summary.table[2,2]` on the Experiences in Close Relationships Scale, and `{r} summary.table[3,2]` on the Rosenberg Self-Esteem Scale.
+
+`{r} gttable.3`
+
+When only including participants in a relationship, participants had a mean score of `{r} filtered_summary_table[1,2]` on the Social Interaction Anxiety Scale, a mean score of `{r} filtered_summary_table[2,2]` on the Experiences in Close Relationships Scale, and a mean score of `{r} filtered_summary_table[3,2]` on the Rosenberg Self-Esteem Scale.
